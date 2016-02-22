@@ -4,3 +4,6 @@
 [submodule "static/quiz/frontend"]
 	path = static/quiz/frontend
 	url = http://github.com/idreyn/achieve-frontend.git
+[submodule "static/frontend"]
+	path = static/frontend
+	url = https://github.com/idreyn/achieve-frontend.git

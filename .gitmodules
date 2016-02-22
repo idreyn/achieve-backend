@@ -1,0 +1,6 @@
+[submodule "static/quiz/achieve-frontend"]
+	path = static/quiz/achieve-frontend
+	url = http://github.com/idreyn/achieve-frontend.git
+[submodule "static/quiz/frontend"]
+	path = static/quiz/frontend
+	url = http://github.com/idreyn/achieve-frontend.git

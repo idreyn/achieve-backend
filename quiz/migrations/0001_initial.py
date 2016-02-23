@@ -15,15 +15,18 @@ class Migration(SchemaMigration):
             ('text', self.gf('django.db.models.fields.TextField')()),
             ('choices', self.gf('django.db.models.fields.TextField')()),
             ('correct', self.gf('django.db.models.fields.TextField')()),
-            ('incorrect_explanation', self.gf('django.db.models.fields.TextField')()),
+            ('explanation', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
         ))
         db.send_create_signal('quiz', ['Question'])
 
         # Adding model 'Quiz'
         db.create_table('quiz_quiz', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('subtitle', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('text', self.gf('django.db.models.fields.TextField')()),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('expires', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
         db.send_create_signal('quiz', ['Quiz'])
 
@@ -48,6 +51,7 @@ class Migration(SchemaMigration):
         # Adding model 'Response'
         db.create_table('quiz_response', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('achiever', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['roster.Achiever'])),
             ('quiz', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['quiz.Quiz'])),
             ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['quiz.Question'])),
             ('response', self.gf('django.db.models.fields.TextField')()),
@@ -78,17 +82,20 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Question'},
             'choices': ('django.db.models.fields.TextField', [], {}),
             'correct': ('django.db.models.fields.TextField', [], {}),
+            'explanation': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'incorrect_explanation': ('django.db.models.fields.TextField', [], {}),
             'text': ('django.db.models.fields.TextField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'default': "'MC'", 'max_length': '2'})
         },
         'quiz.quiz': {
             'Meta': {'object_name': 'Quiz'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'expires': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['quiz.Question']", 'symmetrical': 'False'}),
-            'text': ('django.db.models.fields.TextField', [], {})
+            'subtitle': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'text': ('django.db.models.fields.TextField', [], {}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'quiz.quizkey': {
             'Meta': {'object_name': 'QuizKey'},
@@ -99,6 +106,7 @@ class Migration(SchemaMigration):
         },
         'quiz.response': {
             'Meta': {'object_name': 'Response'},
+            'achiever': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['roster.Achiever']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_correct': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['quiz.Question']"}),

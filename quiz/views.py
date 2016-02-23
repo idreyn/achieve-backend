@@ -42,7 +42,7 @@ def retrieve_quiz(request,key):
 		'text': quiz.text,
 		'questions': []
 	}
-	for qs in quiz.questions.all():
+	for qs in quiz.questions.order_by('id').all():
 		qd = {
 			'id': qs.id,
 			'text': qs.text,

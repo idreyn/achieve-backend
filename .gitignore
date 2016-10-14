@@ -2,3 +2,6 @@ venv/
 *.pyc
 sftp_config
 settings.py
+migrations/
+static/*
+unicodecsv/

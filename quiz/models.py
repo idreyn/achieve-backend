@@ -12,6 +12,7 @@ QUESTION_TYPES = (
 
 class Question(models.Model):
 	type = models.CharField(max_length=2,choices=QUESTION_TYPES,default='MC')
+	index = models.IntegerField()
 	text = models.TextField()
 	choices = models.TextField()
 	correct = models.TextField()
@@ -24,11 +25,13 @@ class Quiz(models.Model):
 	questions = models.ManyToManyField(Question)
 	created = models.DateTimeField(auto_now=True)
 	expires = models.DateTimeField(null=True,blank=True)
+	deployed = models.BooleanField(default=False)
 
 class QuizKey(models.Model):
 	quiz = models.ForeignKey(Quiz)
 	achiever = models.ForeignKey(Achiever)
 	key = models.CharField(max_length=10)
+	accessed = models.DateTimeField(null=True,blank=True)
 
 class Response(models.Model):
 	achiever = models.ForeignKey(Achiever)
@@ -36,3 +39,10 @@ class Response(models.Model):
 	question = models.ForeignKey(Question)
 	response = models.TextField()
 	is_correct = models.BooleanField()
+	time = models.DateTimeField(auto_now=True)
+
+class Milestone(models.Model):
+	achiever = models.ForeignKey(Achiever)
+	response_count = models.IntegerField()
+	time = models.DateTimeField(auto_now=True)
+	claimed = models.BooleanField(default=False)

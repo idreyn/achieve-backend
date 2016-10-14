@@ -6,6 +6,7 @@ from django.conf.urls.defaults import patterns, include, url
 
 urlpatterns = patterns('',
 	url(r'^quiz/',include('achieve.quiz.urls')),
+	url(r'^manage/',include('achieve.manage.urls')),
     # Examples:
     # url(r'^$', 'achieve.views.home', name='home'),
     # url(r'^achieve/', include('achieve.foo.urls')),

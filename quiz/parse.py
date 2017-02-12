@@ -57,7 +57,7 @@ def parse_quiz_yaml(path, string):
 			text=sugar(q['text']),
 			choices=json.dumps(q['choices']),
 			correct=q['correct'],
-			explanation=sugar(q['explanation'] or ''),
+			explanation=sugar(q.get('explanation') or ''),
 			index=i+1
 		)
 		if q.get('type'):

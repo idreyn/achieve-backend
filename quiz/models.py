@@ -27,11 +27,15 @@ class Quiz(models.Model):
 	expires = models.DateTimeField(null=True,blank=True)
 	deployed = models.BooleanField(default=False)
 
+	def deployed_successfully(self):
+		return QuizKey.objects.filter(quiz=self, mail_success=False).count() == 0
+
 class QuizKey(models.Model):
 	quiz = models.ForeignKey(Quiz)
 	achiever = models.ForeignKey(Achiever)
 	key = models.CharField(max_length=10)
 	accessed = models.DateTimeField(null=True,blank=True)
+	mail_success = models.BooleanField(default=False)
 
 class Response(models.Model):
 	achiever = models.ForeignKey(Achiever)

@@ -1,5 +1,6 @@
 import datetime as dt
 import time
+import markdown as md
 
 from quiz.models import Quiz, QuizKey, DeployStatus
 from roster.util import test_achiever
@@ -27,7 +28,7 @@ def deploy_quiz(quiz, testing_email=None, expire_days=120):
 	quiz.save()
 	rec = [test_achiever()] if is_test else quiz.semester.achievers.all()
 	quiz_keys = deploy_keys(quiz, rec)
-	template = string.Template(quiz.email)
+	template = string.Template(md.markdown(quiz.email))
 	for r in rec:
 		qk = QuizKey.objects.get(quiz=quiz,achiever=r)
 		text_rendered = template.substitute({

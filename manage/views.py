@@ -1,7 +1,13 @@
 import json
 import time
-from django.shortcuts import render
+import string
+import markdown as md
 
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+from settings import *
 from ..util import json_response, error_response
 from quiz.models import Quiz, Question, QuizKey, DeployStatus
 import quiz.deploy as deploy
@@ -47,6 +53,22 @@ def retrieve_progress(request, id):
 			'unclaimed': []
 		}
 	})
+
+def preview_email(request, id):
+	quiz = Quiz.objects.get(id=id)
+	template = string.Template(md.markdown(quiz.email))
+	text_rendered = template.substitute({
+		'name': 'Test Achiever',
+		'title': quiz.title,
+		'subtitle': quiz.subtitle,
+		'url': '#',
+		'expires': str(120)
+	})
+	return HttpResponse(render_to_string('email-template.html', {
+		'STATIC_URL': EXTERNAL_URL + STATIC_URL,
+		'title': 'New OTA and announcements from Amphibious Achievement!',
+		'content': text_rendered
+	}))
 
 def update_quiz(request, id):
 	data = json.loads(request.raw_post_data)

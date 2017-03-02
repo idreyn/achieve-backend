@@ -7,3 +7,14 @@ class Achiever(models.Model):
 
 	def full_name(self):
 		return self.first_name + ' ' + self.last_name
+
+class Semester(models.Model):
+	year = models.IntegerField()
+	is_spring = models.BooleanField()
+	achievers = models.ManyToManyField(Achiever)
+
+	def full_name(self):
+		return "%s %s" % (
+			"Spring" if self.is_spring else "Fall",
+			str(self.year)
+		)

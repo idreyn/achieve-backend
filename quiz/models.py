@@ -1,6 +1,13 @@
 from django.db import models
+from achieve.roster.models import Achiever, Semester
+from achieve.roster.util import current_semester
 
-from achieve.roster.models import Achiever
+class DeployStatus(object):
+	UNDEPLOYED = 0
+	STARTED = 1
+	PARTIAL = 2
+	SUCCESS = 3
+	SUCCESS_TEST = 4
 
 QUESTION_TYPES = (
 	('MC','Multiple Choice'),
@@ -25,17 +32,30 @@ class Quiz(models.Model):
 	questions = models.ManyToManyField(Question)
 	created = models.DateTimeField(auto_now=True)
 	expires = models.DateTimeField(null=True,blank=True)
-	deployed = models.BooleanField(default=False)
+	email = models.TextField(default='')
+	semester = models.ForeignKey(Semester,null=True)
+	deploy_status = models.IntegerField(default=DeployStatus.UNDEPLOYED)
 
-	def deployed_successfully(self):
-		return QuizKey.objects.filter(quiz=self, mail_success=False).count() == 0
+	def save(self, *args, **kwargs):
+		if self.semester is None:  # Set default reference
+			self.semester = current_semester()
+		super(Quiz, self).save(*args, **kwargs)
 
 class QuizKey(models.Model):
 	quiz = models.ForeignKey(Quiz)
 	achiever = models.ForeignKey(Achiever)
 	key = models.CharField(max_length=10)
 	accessed = models.DateTimeField(null=True,blank=True)
-	mail_success = models.BooleanField(default=False)
+	email_response = models.IntegerField(default=0)
+
+	def email_success(self):
+		return self.email_response == 200
+
+	def email_fail(self):
+		return not self.email_success() and self.email_response > 0
+
+	def email_started(self):
+		return self.email_response > 0
 
 class Response(models.Model):
 	achiever = models.ForeignKey(Achiever)

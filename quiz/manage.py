@@ -7,6 +7,7 @@ from parse import *
 from grader import *
 from deploy import *
 from util import *
+from roster.util import test_achiever
 
 def roster_from_csv(path,delimiter=',',yes_delete_current_roster=False):
 	if not yes_delete_current_roster:
@@ -18,7 +19,7 @@ def roster_from_csv(path,delimiter=',',yes_delete_current_roster=False):
 		print 'You have five seconds to cancel (ctrl+c)...'
 		time.sleep(5)
 	print 'Loading roster from CSV file...'
-	Achiever.objects.exclude(id=TEST_ACHIEVER.id).delete()
+	Achiever.objects.exclude(id=test_achiever().id).delete()
 	with open(path,'rU') as file:
 		cf = unicodecsv.reader(file,delimiter=delimiter,quotechar='|',encoding='ISO-8859-1')
 		for row in cf:

@@ -1,10 +1,8 @@
 import random
 import string
 
-from models import *
-
-def test_achiever():
-	return Achiever.objects.get(first_name="Test")
+from models import QuizKey
+from roster.models import *
 
 def human_date(d):
 	return d.strftime("%Y-%m-%d @ %H:%M")
@@ -17,3 +15,4 @@ def random_quiz_key(length=10):
 		)
 		if not QuizKey.objects.filter(key=generate).exists():
 			return generate
+

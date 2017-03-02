@@ -1,11 +1,19 @@
 import json
+import time
 from django.shortcuts import render
 
 from ..util import json_response, error_response
-from quiz.models import Quiz, Question
+from quiz.models import Quiz, Question, QuizKey, DeployStatus
+import quiz.deploy as deploy
+
+def view_dashboard(request):
+	return render(request, 'dashboard.html')
 
 def build_quiz(request, id):
 	return render(request, 'builder.html')
+
+def view_quiz(request, id):
+	return render(request, 'quiz.html')
 
 # Get JSON representation of quiz
 def retrieve_quiz(request, id):
@@ -15,8 +23,7 @@ def retrieve_quiz(request, id):
 		'title': quiz.title,
 		'subtitle': quiz.subtitle,
 		'text': quiz.text,
-		'deployed': quiz.deployed,
-		'deployed_successfully': quiz.deployed_successfully(),
+		'email': quiz.email,
 		'questions': []
 	}
 	for qs in quiz.questions.order_by('index').all():
@@ -47,6 +54,7 @@ def update_quiz(request, id):
 	quiz.title = data.get("title", quiz.title)
 	quiz.subtitle = data.get("subtitle", quiz.subtitle)
 	quiz.text = data.get("text", quiz.text)
+	quiz.email = data.get("email", quiz.email)
 	qids = []
 	for qd in data.get("questions",[]):
 		qid = qd.get("id", None)
@@ -77,8 +85,31 @@ def update_quiz(request, id):
 	quiz.save()
 	return retrieve_quiz(request, id)
 
+def deploy_status(request, id):
+	quiz = Quiz.objects.get(id=id)
+	quiz_keys = QuizKey.objects.filter(quiz=quiz)
+	return json_response({
+		"status": quiz.deploy_status,
+		"email_success": len([qk for qk in quiz_keys if qk.email_success()]),
+		"email_fail": len([qk for qk in quiz_keys if qk.email_fail()]),
+		"email_pending": [
+			qk.achiever.full_name() for qk in quiz_keys if not qk.email_success()
+		],
+		"email_total": len(quiz_keys)
+	})
 
-
-def view_quiz(request, id):
-	return render(request, 'quiz.html')
+def deploy_quiz(request, id):
+	try:
+		data = json.loads(request.raw_post_data)
+	except:
+		data = {}
+	quiz = Quiz.objects.get(id=id)
+	if data.get("abandon"):
+		quiz.deploy_status = DeployStatus.UNDEPLOYED
+		quiz.save()
+	else:
+		quiz.deploy_status = DeployStatus.STARTED
+		quiz.save()
+		deploy.deploy_quiz(quiz, testing_email=data.get("email"))
+	return deploy_status(request, id)
 
